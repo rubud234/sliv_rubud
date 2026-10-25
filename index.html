@@ -1,89 +1,136 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Страница</title>
-<style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: #111;
-  color: white;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
-#start {
-  margin-top: 40vh;
-  padding: 16px 28px;
-  font-size: 20px;
-  border: 0;
-  border-radius: 10px;
-}
-#scare {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: #111;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-#face { font-size: 30vw; }
-#message { font-size: 24px; }
-#black {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: black;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Не нажимай сюда</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Экран с кнопкой для запуска (нужен для обхода блокировки звука) */
+        #start-screen {
+            text-align: center;
+            color: #555;
+            cursor: pointer;
+            user-select: none;
+            z-index: 10;
+        }
+
+        #start-screen h1 {
+            font-size: 24px;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* Экран со скримером */
+        #scare-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background-color: black;
+            /* Сюда можно добавить картинку скримера */
+            /* background-image: url('ссылка_на_страшную_картинку.jpg'); */
+            /* background-size: cover; */
+            /* background-position: center; */
+        }
+
+        /* Тряска экрана для пущего эффекта */
+        .shake {
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+    </style>
 </head>
 <body>
-<h2>Ты готов?</h2>
-<button id="start">НАЖМИ СЮДА</button>
-<div id="scare">
-  <div id="face">👹</div>
-  <div id="message">ПОПАЛСЯ! 😈</div>
-</div>
-<div id="black"></div>
-<script>
-const start = document.getElementById('start');
-const scare = document.getElementById('scare');
-const black = document.getElementById('black');
 
-start.onclick = () => {
-  start.disabled = true;
-  start.textContent = 'Подожди...';
+    <!-- Экран до клика -->
+    <div id="start-screen" onclick="startPrank()">
+        <h1>Включи звук на максимум и нажми сюда...</h1>
+    </div>
 
-  setTimeout(() => {
-    scare.style.display = 'flex';
+    <!-- Сам скример -->
+    <div id="scare-screen">
+        <audio id="scream-audio" src="https://www.myinstants.com/media/sounds/screamer.mp3" preload="auto"></audio>
+        <!-- Примечание: я поставил ссылку на популярный скример из интернета. 
+             Если у тебя есть свой файл (например scream.mp3), загрузи его в репозиторий 
+             и поменяй ссылку в теге <audio> выше на 'scream.mp3' -->
+    </div>
 
-    try {
-      const audio = new AudioContext();
-      const oscillator = audio.createOscillator();
-      const gain = audio.createGain();
-      oscillator.type = 'sawtooth';
-      oscillator.frequency.value = 180;
-      gain.gain.value = 0.12;
-      oscillator.connect(gain);
-      gain.connect(audio.destination);
-      oscillator.start();
-      oscillator.stop(audio.currentTime + 0.6);
-    } catch (e) {}
+    <script>
+        function startPrank() {
+            // 1. Скрываем начальный экран
+            document.getElementById('start-screen').style.display = 'none';
+            
+            // 2. Показываем экран скримера
+            const scareScreen = document.getElementById('scare-screen');
+            scareScreen.style.display = 'block';
+            
+            // 3. Добавляем эффект тряски
+            scareScreen.classList.add('shake');
 
-    setTimeout(() => {
-      scare.style.display = 'none';
-      black.style.display = 'block';
+            // 4. Работа со звуком
+            const audio = document.getElementById('scream-audio');
+            
+            // Выкручиваем громкость самого аудиоплеера на 100% (1.0)
+            audio.volume = 1.0; 
+            
+            // Воспроизводим звук
+            audio.play().catch(function(error) {
+                console.log("Ошибка воспроизведения: ", error);
+                // Если браузер все равно заблокировал, можно попробовать еще раз
+                alert("Нажми еще раз, чтобы включить звук!");
+            });
 
-      setTimeout(() => {
-        black.style.display = 'none';
-        document.body.innerHTML =
-          '<h2 style="margin-top:40vh">😂 Это был пранк!</h2>';
-      }, 1200);
-    }, 1000);
-  }, 1500);
-};
-</script>
+            // 5. (Опционально) Попытка включить вибрацию на телефоне (работает не везде)
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 1000]);
+            }
+
+            // 6. (Опционально) Через 5 секунд остановить звук и вернуть все назад
+            // Если хочешь, чтобы звук не прекращался, удали или закомментируй код ниже
+            /*
+            setTimeout(() => {
+                audio.pause();
+                scareScreen.style.display = 'none';
+                scareScreen.classList.remove('shake');
+                document.getElementById('start-screen').style.display = 'flex';
+                document.getElementById('start-screen').innerHTML = "<h1>Шутка! 😂</h1>";
+            }, 5000);
+            */
+        }
+    </script>
 </body>
 </html>
