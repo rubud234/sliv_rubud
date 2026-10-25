@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Страница</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #111;
+  color: white;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+#start {
+  margin-top: 40vh;
+  padding: 16px 28px;
+  font-size: 20px;
+  border: 0;
+  border-radius: 10px;
+}
+#scare {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: #111;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#face { font-size: 30vw; }
+#message { font-size: 24px; }
+#black {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: black;
+}
+</style>
+</head>
+<body>
+<h2>Ты готов?</h2>
+<button id="start">НАЖМИ СЮДА</button>
+<div id="scare">
+  <div id="face">👹</div>
+  <div id="message">ПОПАЛСЯ! 😈</div>
+</div>
+<div id="black"></div>
+<script>
+const start = document.getElementById('start');
+const scare = document.getElementById('scare');
+const black = document.getElementById('black');
+
+start.onclick = () => {
+  start.disabled = true;
+  start.textContent = 'Подожди...';
+
+  setTimeout(() => {
+    scare.style.display = 'flex';
+
+    try {
+      const audio = new AudioContext();
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      oscillator.type = 'sawtooth';
+      oscillator.frequency.value = 180;
+      gain.gain.value = 0.12;
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start();
+      oscillator.stop(audio.currentTime + 0.6);
+    } catch (e) {}
+
+    setTimeout(() => {
+      scare.style.display = 'none';
+      black.style.display = 'block';
+
+      setTimeout(() => {
+        black.style.display = 'none';
+        document.body.innerHTML =
+          '<h2 style="margin-top:40vh">😂 Это был пранк!</h2>';
+      }, 1200);
+    }, 1000);
+  }, 1500);
+};
+</script>
+</body>
+</html>
