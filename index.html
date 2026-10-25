@@ -37,12 +37,11 @@
 </head>
 <body>
 
-    <!-- Кнопка, которая видна изначально -->
     <button class="btn" id="startBtn">Посмотреть</button>
 
-    <!-- Аудио файл со стонами (я взял рабочий пример со звуком стона) -->
+    <!-- 关键：这里使用本地文件名，需确保 moan.mp3 已上传到同一目录 -->
     <audio id="moanSound" preload="auto">
-        <source src="https://www.soundjay.com/human/stab-victim-1.mp3" type="audio/mpeg">
+        <source src="moan.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -50,19 +49,19 @@
         const sound = document.getElementById('moanSound');
 
         btn.addEventListener('click', function() {
-            // Прячем кнопку
+            // 隐藏按钮
             btn.style.display = 'none';
             
-            // Делаем звук на максимум (если браузер позволит)
+            // 设置音量为最大
             sound.volume = 1.0; 
             
-            // Воспроизводим звук
+            // 播放声音，并捕获可能的浏览器拦截错误
             sound.play().catch(function(error) {
-                console.log("Браузер заблокировал звук, нужно нажать еще раз:", error);
+                console.log("Ошибка воспроизведения:", error);
+                // 如果浏览器拦截了自动播放，尝试显示提示或重新触发
+                alert("Нажмите ещё раз, чтобы включить звук");
+                btn.style.display = 'block'; // 把按钮显示回来让用户再点一次
             });
-
-            // Можно добавить текст после нажатия, например:
-            // document.body.innerHTML = "<h1>Шутка удалась!</h1>";
         });
     </script>
 
