@@ -3,81 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сюрприз!</title>
+    <title>Шутка</title>
     <style>
         body {
-            background-color: #121212; /* Темный фон */
-            color: white;
-            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
+            font-family: Arial, sans-serif;
             overflow: hidden;
         }
-
-        /* Стили для кнопки */
-        .prank-button {
-            font-size: 40px; /* Очень большая надпись */
-            font-weight: bold;
-            padding: 20px 50px;
+        .btn {
+            font-size: 24px;
+            padding: 15px 40px;
             background-color: #ff4757;
             color: white;
             border: none;
-            border-radius: 15px;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.4);
-            transition: transform 0.1s, background-color 0.3s;
-            text-transform: uppercase;
+            transition: 0.3s;
+            font-weight: bold;
         }
-
-        .prank-button:active {
-            transform: scale(0.95); /* Эффект нажатия */
+        .btn:hover {
+            background-color: #ff6b81;
         }
-
-        /* Класс, который применится после клика */
-        .clicked {
-            background-color: #2ed573;
-            font-size: 30px; /* Уменьшаем размер, чтобы влезло */
+        .btn:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
 
-    <h2 style="font-size: 24px; text-align: center; margin-bottom: 20px;">Хочешь увидеть кое-что смешное?</h2>
-    
-    <!-- Сама кнопка -->
-    <button id="prankBtn" class="prank-button">Посмотреть</button>
+    <!-- Кнопка, которая видна изначально -->
+    <button class="btn" id="startBtn">Посмотреть</button>
 
-    <!-- Скрытое аудио со смехом -->
-    <audio id="laughSound">
-        <!-- Ссылка на звук смеха из свободной библиотеки -->
-        <source src="https://www.myinstants.com/media/sounds/laugh.mp3" type="audio/mpeg">
-        Ваш браузер не поддерживает аудио.
+    <!-- Аудио файл со стонами (я взял рабочий пример со звуком стона) -->
+    <audio id="moanSound" preload="auto">
+        <source src="https://www.soundjay.com/human/stab-victim-1.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        const btn = document.getElementById('prankBtn');
-        const audio = document.getElementById('laughSound');
+        const btn = document.getElementById('startBtn');
+        const sound = document.getElementById('moanSound');
 
-        btn.addEventListener('click', () => {
-            // 1. Меняем текст и цвет кнопки
-            btn.textContent = 'Нажми сюда';
-            btn.classList.add('clicked');
+        btn.addEventListener('click', function() {
+            // Прячем кнопку
+            btn.style.display = 'none';
             
-            // 2. Делаем звук максимально громким (1.0 - это максимум)
-            audio.volume = 1.0;
+            // Делаем звук на максимум (если браузер позволит)
+            sound.volume = 1.0; 
             
-            // 3. Воспроизводим звук
-            audio.play();
+            // Воспроизводим звук
+            sound.play().catch(function(error) {
+                console.log("Браузер заблокировал звук, нужно нажать еще раз:", error);
+            });
 
-            // 4. Делаем так, чтобы при повторном нажатии звук начинался заново
-            btn.onclick = function() {
-                audio.currentTime = 0; 
-                audio.play();
-            };
+            // Можно добавить текст после нажатия, например:
+            // document.body.innerHTML = "<h1>Шутка удалась!</h1>";
         });
     </script>
 
