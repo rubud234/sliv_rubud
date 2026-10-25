@@ -1,193 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Взлом...</title>
-    <style>
-        body {
-            background-color: #000;
-            color: #0f0; /* Зеленый цвет */
-            font-family: 'Courier New', Courier, monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            text-align: center;
-        }
-        .btn {
-            font-size: 22px;
-            padding: 15px 40px;
-            background-color: #333;
-            color: white;
-            border: 2px solid #0f0;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            font-family: Arial, sans-serif;
-            z-index: 10;
-        }
-        .btn:active { transform: scale(0.95); }
-        
-        /* Экран с фото */
-        #photoScreen { display: none; flex-direction: column; z-index: 10; }
-        #photoScreen img { max-width: 80vw; max-height: 60vh; border: 2px solid #0f0; margin-bottom: 20px; }
-        
-        /* Экран взлома */
-        #hackScreen { display: none; width: 100%; height: 100vh; position: absolute; top: 0; left: 0; }
-        
-        /* Бегущие цифры на фоне */
-        #matrix {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            opacity: 0.6;
-            z-index: 1;
-        }
-        
-        /* Текст поверх цифр */
-        #hackInfo {
-            position: relative;
-            z-index: 2;
-            margin-top: 40vh;
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
-            border: 2px solid #0f0;
-            display: inline-block;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Продолжить</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background:#000; color:#fff; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    font-family:sans-serif; overflow:hidden;
+  }
+  #btn {
+    padding:18px 60px; font-size:22px; font-weight:600; color:#fff;
+    background:#1a1a1a; border:2px solid #444; border-radius:12px;
+    cursor:pointer; letter-spacing:1px; transition:.2s;
+  }
+  #btn:hover { background:#2a2a2a; border-color:#666; transform:scale(1.05); }
 
-        #percentText { font-size: 40px; margin: 10px 0; font-weight: bold; }
-        #statusText { font-size: 18px; margin-bottom: 20px; }
-        #successText { display: none; font-size: 24px; color: #fff; background: #0f0; color: #000; padding: 15px; font-weight: bold; }
-    </style>
+  #scare {
+    position:fixed; inset:0; z-index:9999; display:none; background:#000;
+  }
+  #scare img { width:100%; height:100%; object-fit:cover; }
+  #scare.show { display:block; animation:shake .08s infinite, flash .15s infinite; }
+
+  @keyframes shake {
+    0%{transform:translate(0,0)} 25%{transform:translate(-14px,9px) rotate(-1.5deg)}
+    50%{transform:translate(14px,-9px) rotate(1.5deg)}
+    75%{transform:translate(-9px,-14px) rotate(-1deg)}
+    100%{transform:translate(9px,14px) rotate(1deg)}
+  }
+  @keyframes flash {
+    0%,100%{filter:brightness(1) contrast(1.2)}
+    50%{filter:brightness(2) contrast(1.6) saturate(2)}
+  }
+</style>
 </head>
 <body>
 
-    <!-- Экран 1: Кнопка Продолжить -->
-    <button class="btn" id="startBtn">Продолжить</button>
+<button id="btn">ПРОДОЛЖИТЬ</button>
 
-    <!-- Экран 2: Фото -->
-    <div id="photoScreen">
-        <!-- Ссылка на картинку (можно заменить на свою) -->
-        <img src="https://picsum.photos/400/300" alt="Фото">
-        <button class="btn" id="viewPhotoBtn">Посмотреть фото</button>
-    </div>
+<div id="scare">
+  <img id="scareImg" alt="">
+</div>
 
-    <!-- Экран 3: Взлом -->
-    <div id="hackScreen">
-        <canvas id="matrix"></canvas>
-        <div id="hackInfo">
-            <div id="statusText">ПЕРЕДАЧА ДАННЫХ...</div>
-            <div id="percentText">1%</div>
-            <div id="successText">УСПЕШНО!<br>Данные перенесены.</div>
-        </div>
-    </div>
+<audio id="scareSound" preload="auto" loop></audio>
 
-    <script>
-        const startBtn = document.getElementById('startBtn');
-        const photoScreen = document.getElementById('photoScreen');
-        const viewPhotoBtn = document.getElementById('viewPhotoBtn');
-        const hackScreen = document.getElementById('hackScreen');
-        const percentText = document.getElementById('percentText');
-        const statusText = document.getElementById('statusText');
-        const successText = document.getElementById('successText');
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
+<script>
+// Прямая ссылка на звук скримера (громкий, с Pixabay)
+const SOUND_URL = "https://cdn.pixabay.com/download/audio/2025/02/12/audio_298866e0e2.mp3?filename=scary-sound-effect-298866.mp3";
 
-        // 1. Нажимаем Продолжить
-        startBtn.addEventListener('click', () => {
-            startBtn.style.display = 'none';
-            photoScreen.style.display = 'flex';
-        });
+// Прямая ссылка на страшную картинку (с бесплатного стока)
+const IMAGE_URL = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1920&auto=format&fit=crop";
 
-        // 2. Нажимаем Посмотреть фото (Начинается взлом)
-        viewPhotoBtn.addEventListener('click', () => {
-            photoScreen.style.display = 'none';
-            hackScreen.style.display = 'block';
-            
-            // Включаем звук шуршания
-            playNoise();
-            
-            // Запускаем зеленые цифры
-            startMatrix();
-            
-            // Запускаем прогресс-бар (от 1 до 100 за 10 секунд)
-            let progress = 1;
-            const interval = setInterval(() => {
-                progress++;
-                percentText.innerText = progress + '%';
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    finishHack();
-                }
-            }, 100); // 100мс * 100 = 10 секунд
-        });
+document.getElementById('scareImg').src = IMAGE_URL;
+const sound = document.getElementById('scareSound');
+sound.src = SOUND_URL;
 
-        // Функция создания звука шуршания/помех
-        function playNoise() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            const audioCtx = new AudioContext();
-            
-            // Создаем буфер белого шума
-            const bufferSize = audioCtx.sampleRate * 10; // 10 секунд
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const output = buffer.getChannelData(0);
-            
-            for (let i = 0; i < bufferSize; i++) {
-                output[i] = Math.random() * 2 - 1;
-            }
-            
-            const whiteNoise = audioCtx.createBufferSource();
-            whiteNoise.buffer = buffer;
-            
-            // Фильтр, чтобы звук был глухим (как передача данных по проводам)
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = 1000;
-            
-            whiteNoise.connect(filter);
-            filter.connect(audioCtx.destination);
-            whiteNoise.start();
-        }
+let done = false;
+document.getElementById('btn').addEventListener('click', () => {
+  if (done) return;
+  done = true;
 
-        // Функция бегущих зеленых цифр
-        function startMatrix() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            
-            const columns = canvas.width / 14; // Ширина символов
-            const drops = [];
-            for (let x = 0; x < columns; x++) drops[x] = 1;
+  // Максимальная громкость
+  sound.volume = 1.0;
+  sound.currentTime = 0;
+  sound.play().catch(()=>{});
 
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#0f0';
-                ctx.font = '14px monospace';
+  const box = document.getElementById('scare');
+  box.classList.add('show');
+  document.documentElement.requestFullscreen?.().catch(()=>{});
 
-                for (let i = 0; i < drops.length; i++) {
-                    const text = String.fromCharCode(0x30A0 + Math.random() * 96); // Японские катаканы (как в Матрице)
-                    ctx.fillText(text, i * 14, drops[i] * 14);
-                    
-                    if (drops[i] * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
-                if (hackScreen.style.display === 'block') requestAnimationFrame(draw);
-            }
-            draw();
-        }
-
-        // Функция завершения
-        function finishHack() {
-            statusText.innerText = "СТАТУС: ЗАВЕРШЕНО";
-            percentText.style.display = 'none';
-            successText.style.display = 'block';
-            successText.style.backgroundColor = '#0f0';
-            successText.style.color = '#000';
-        }
-    </script>
+  // Длительность скримера — 3 секунды
+  setTimeout(() => {
+    box.classList.remove('show');
+    sound.pause();
+    sound.currentTime = 0;
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(()=>{});
+  }, 3000);
+});
+</script>
 
 </body>
 </html>
