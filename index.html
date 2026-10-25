@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Скример</title>
     <style>
         body, html {
@@ -15,7 +15,6 @@
             font-family: sans-serif;
         }
 
-        /* Кнопка */
         #start-btn {
             position: absolute;
             top: 50%;
@@ -38,14 +37,13 @@
             border-color: white;
         }
 
-        /* Слой скримера */
         #scare-layer {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             background-color: black;
             z-index: 9999;
             justify-content: center;
@@ -53,16 +51,14 @@
             cursor: none;
         }
 
-        /* Картинка скримера */
         #scare-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            filter: contrast(1.3) brightness(0.8);
+            object-fit: cover; /* Вот тут картинка растягивается на весь экран */
+            filter: contrast(1.5) brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(3); /* Злой красный оттенок */
             animation: zoomShake 0.1s infinite;
         }
 
-        /* Анимация вылета и тряски */
         @keyframes zoomShake {
             0% { transform: scale(1) translate(0, 0) rotate(0deg); }
             20% { transform: scale(1.1) translate(-5px, 5px) rotate(-1deg); }
@@ -75,10 +71,11 @@
 </head>
 <body>
 
-    <button id="start-btn">ПОСМОТРЕТЬ</button>
+    <button id="start-btn">ПРОДОЛЖИТЬ</button>
 
     <div id="scare-layer">
-        <img id="scare-img" src="https://i.ibb.co/6P4y6yF/clown.jpg" alt="Scary Clown">
+        <!-- ТУТ САМА КАРТИНКА. Она вшита прямо в код и не может сломаться -->
+        <img id="scare-img" src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=" alt="Scary">
     </div>
 
     <script>
@@ -93,23 +90,20 @@
             }
 
             const now = audioContext.currentTime;
-            const duration = 30; // Длительность 30 секунд
+            const duration = 15; 
             
-            // 1. Высокий крик
             const osc1 = audioContext.createOscillator();
             const gain1 = audioContext.createGain();
             osc1.type = 'sawtooth'; 
             osc1.frequency.setValueAtTime(1200, now); 
             osc1.frequency.exponentialRampToValueAtTime(400, now + duration); 
 
-            // 2. Низкий рык (бас)
             const osc2 = audioContext.createOscillator();
             const gain2 = audioContext.createGain();
             osc2.type = 'square'; 
             osc2.frequency.setValueAtTime(150, now); 
             osc2.frequency.exponentialRampToValueAtTime(50, now + duration);
 
-            // 3. Шум (хрип, скрежет)
             const bufferSize = audioContext.sampleRate * duration;
             const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
             const data = buffer.getChannelData(0);
@@ -119,7 +113,6 @@
             const noise = audioContext.createBufferSource();
             noise.buffer = buffer;
 
-            // Настройка громкости (плавное затухание к концу 30-й секунды)
             gain1.gain.setValueAtTime(0.6, now);
             gain1.gain.exponentialRampToValueAtTime(0.01, now + duration);
             
@@ -134,7 +127,6 @@
 
             noise.connect(audioContext.destination);
 
-            // Запуск на 30 секунд
             osc1.start(now);
             osc1.stop(now + duration);
             
@@ -149,23 +141,24 @@
             if (isScared) return;
             isScared = true;
 
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen();
-            }
-
             playScarySound();
 
             startBtn.style.display = 'none'; 
             scareLayer.style.display = 'flex'; 
             
-            // Ждем 30 секунд (30000 мс), затем скрываем и перезагружаем
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log("Полный экран не включился: ", err);
+                });
+            }
+
             setTimeout(() => {
                 scareLayer.style.display = 'none'; 
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 }
                 location.reload(); 
-            }, 30000); // 30 секунд
+            }, 15000); 
         });
     </script>
 </body>
