@@ -44,38 +44,57 @@
   <img id="scareImg" alt="">
 </div>
 
-<audio id="scareSound" preload="auto" loop></audio>
+<!-- Звук 1: Женский крик ужаса (Pixabay) -->
+<audio id="sound1" preload="auto" loop></audio>
+<!-- Звук 2: Громкий мужской крик (Orange Free Sounds) -->
+<audio id="sound2" preload="auto" loop></audio>
 
 <script>
-// Прямая ссылка на звук скримера (громкий, с Pixabay)
-const SOUND_URL = "https://cdn.pixabay.com/download/audio/2025/02/12/audio_298866e0e2.mp3?filename=scary-sound-effect-298866.mp3";
+// --- ССЫЛКИ НА ЗВУКИ ---
+// 1. Реалистичный женский крик (Pixabay)
+const SOUND_1 = "https://cdn.pixabay.com/download/audio/2025/07/25/audio_379378.mp3";
+// 2. Громкий короткий мужской крик (Orange Free Sounds)
+const SOUND_2 = "https://orangefreesounds.com/wp-content/uploads/2026/05/Loud-Scream-Sound-Effect.mp3";
 
-// Прямая ссылка на страшную картинку (с бесплатного стока)
+// Картинка (оставил ту же)
 const IMAGE_URL = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1920&auto=format&fit=crop";
 
 document.getElementById('scareImg').src = IMAGE_URL;
-const sound = document.getElementById('scareSound');
-sound.src = SOUND_URL;
+
+const audio1 = document.getElementById('sound1');
+const audio2 = document.getElementById('sound2');
+audio1.src = SOUND_1;
+audio2.src = SOUND_2;
 
 let done = false;
 document.getElementById('btn').addEventListener('click', () => {
   if (done) return;
   done = true;
 
-  // Максимальная громкость
-  sound.volume = 1.0;
-  sound.currentTime = 0;
-  sound.play().catch(()=>{});
+  // --- ЗАПУСК ЗВУКОВ ---
+  // Устанавливаем максимальную громкость
+  audio1.volume = 1.0;
+  audio2.volume = 1.0;
+  
+  // Сбрасываем на начало и играем
+  audio1.currentTime = 0;
+  audio2.currentTime = 0;
+  
+  audio1.play().catch(()=>{});
+  audio2.play().catch(()=>{});
 
+  // --- ВИЗУАЛЬНЫЙ ЭФФЕКТ ---
   const box = document.getElementById('scare');
   box.classList.add('show');
   document.documentElement.requestFullscreen?.().catch(()=>{});
 
-  // Длительность скримера — 3 секунды
+  // Длительность 3 секунды
   setTimeout(() => {
     box.classList.remove('show');
-    sound.pause();
-    sound.currentTime = 0;
+    audio1.pause();
+    audio2.pause();
+    audio1.currentTime = 0;
+    audio2.currentTime = 0;
     if (document.fullscreenElement) document.exitFullscreen?.().catch(()=>{});
   }, 3000);
 });
