@@ -14,7 +14,6 @@
             height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
-            overflow: hidden;
         }
         .btn {
             font-size: 24px;
@@ -24,11 +23,7 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: 0.3s;
             font-weight: bold;
-        }
-        .btn:hover {
-            background-color: #ff6b81;
         }
         .btn:active {
             transform: scale(0.95);
@@ -39,9 +34,9 @@
 
     <button class="btn" id="startBtn">Посмотреть</button>
 
-    <!-- 关键：这里使用本地文件名，需确保 moan.mp3 已上传到同一目录 -->
+    <!-- Ссылка на надежный архивный файл со стоном -->
     <audio id="moanSound" preload="auto">
-        <source src="moan.mp3" type="audio/mpeg">
+        <source src="https://ia800204.us.archive.org/26/items/StoN/StoN.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -49,19 +44,21 @@
         const sound = document.getElementById('moanSound');
 
         btn.addEventListener('click', function() {
-            // 隐藏按钮
-            btn.style.display = 'none';
-            
-            // 设置音量为最大
+            btn.style.display = 'none'; 
             sound.volume = 1.0; 
             
-            // 播放声音，并捕获可能的浏览器拦截错误
-            sound.play().catch(function(error) {
-                console.log("Ошибка воспроизведения:", error);
-                // 如果浏览器拦截了自动播放，尝试显示提示或重新触发
-                alert("Нажмите ещё раз, чтобы включить звук");
-                btn.style.display = 'block'; // 把按钮显示回来让用户再点一次
-            });
+            // Попытка воспроизвести звук
+            let playPromise = sound.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    // Звук пошел
+                }).catch(error => {
+                    // Если браузер заблокировал
+                    alert("Браузер заблокировал звук. Нажмите ОК и попробуйте нажать кнопку еще раз!");
+                    btn.style.display = 'block'; // Возвращаем кнопку
+                });
+            }
         });
     </script>
 
