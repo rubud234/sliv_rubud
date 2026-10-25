@@ -34,31 +34,36 @@
 
     <button class="btn" id="startBtn">Посмотреть</button>
 
-    <!-- Ссылка на надежный архивный файл со стоном -->
-    <audio id="moanSound" preload="auto">
-        <source src="https://ia800204.us.archive.org/26/items/StoN/StoN.mp3" type="audio/mpeg">
-    </audio>
-
     <script>
-        const btn = document.getElementById('startBtn');
-        const sound = document.getElementById('moanSound');
+        document.getElementById('startBtn').addEventListener('click', function() {
+            this.style.display = 'none'; // Прячем кнопку
 
-        btn.addEventListener('click', function() {
-            btn.style.display = 'none'; 
-            sound.volume = 1.0; 
+            // Создаем аудио-контекст (работает без файлов)
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioContext();
+
+            // Создаем осциллятор (генератор звука)
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+
+            // Настраиваем "стонущий" звук (низкая частота с вибрацией)
+            osc.type = 'sawtooth'; // Звук более "скрипучий" и жалобный
+            osc.frequency.setValueAtTime(100, ctx.currentTime); // Начальная частота
             
-            // Попытка воспроизвести звук
-            let playPromise = sound.play();
+            // Делаем эффект "завывания"
+            osc.frequency.linearRampToValueAtTime(60, ctx.currentTime + 1.5); // Понижаем тон
+            osc.frequency.linearRampToValueAtTime(120, ctx.currentTime + 3.0); // Повышаем обратно
+
+            // Настройка громкости
+            gain.gain.setValueAtTime(1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 3.5); // Плавно затихает
+
+            // Подключаем и запускаем
+            osc.connect(gain);
+            gain.connect(ctx.destination);
             
-            if (playPromise !== undefined) {
-                playPromise.then(_ => {
-                    // Звук пошел
-                }).catch(error => {
-                    // Если браузер заблокировал
-                    alert("Браузер заблокировал звук. Нажмите ОК и попробуйте нажать кнопку еще раз!");
-                    btn.style.display = 'block'; // Возвращаем кнопку
-                });
-            }
+            osc.start();
+            osc.stop(ctx.currentTime + 3.5); // Длительность звука 3.5 секунды
         });
     </script>
 
