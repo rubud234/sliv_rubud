@@ -44,19 +44,16 @@
   <img id="scareImg" alt="Страшная картинка">
 </div>
 
-<!-- Аудио теги с crossorigin для безопасной загрузки -->
-<audio id="sound1" preload="auto" crossorigin="anonymous"></audio>
-<audio id="sound2" preload="auto" crossorigin="anonymous"></audio>
+<audio id="sound1" preload="auto"></audio>
+<audio id="sound2" preload="auto"></audio>
 
 <script>
-// --- РАБОЧИЕ ССЫЛКИ НА ЗВУКИ ---
-// 1. Громкий мужской крик (прямая ссылка с GitHub CDN)
-const SOUND_1 = "https://github.com/rafaelreis-hotmart/Audio-Sample-files/raw/master/sample.mp3"; 
-// ВНИМАНИЕ: Если этот звук не подходит, замените ссылку на свою.
-// 2. Женский крик (используем тот же файл для надежности, либо замените на свой)
-const SOUND_2 = "https://github.com/rafaelreis-hotmart/Audio-Sample-files/raw/master/sample.mp3";
+// --- ПРЯМЫЕ ССЫЛКИ НА КРИКИ (Pixabay CDN, MP3) ---
+// 1. Женский ультра-реалистичный крик
+const SOUND_1 = "https://cdn.pixabay.com/download/audio/2025/07/25/audio_7d9e9c2d7b.mp3?filename=scary-woman-scream-ultra-realistic-379378.mp3";
+// 2. Мужской громкий крик (страх/паника)
+const SOUND_2 = "https://cdn.pixabay.com/download/audio/2024/12/17/audio_5e6b0a8c1f.mp3?filename=shock-scream-02-277551.mp3";
 
-// Картинка (оставил ту же)
 const IMAGE_URL = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1920&auto=format&fit=crop";
 
 document.getElementById('scareImg').src = IMAGE_URL;
@@ -72,16 +69,19 @@ document.getElementById('btn').addEventListener('click', () => {
   if (done) return;
   done = true;
 
-  // --- ЗАПУСК ЗВУКОВ (максимальная громкость) ---
+  // --- ПРИНУДИТЕЛЬНЫЙ ЗАПУСК ЗВУКА (для мобильных) ---
   audio1.volume = 1.0;
   audio2.volume = 1.0;
   
   audio1.currentTime = 0;
   audio2.currentTime = 0;
   
-  // Играем оба одновременно
-  audio1.play().catch(e => console.log("Ошибка звука 1:", e));
-  audio2.play().catch(e => console.log("Ошибка звука 2:", e));
+  // Играем оба. На телефоне это сработает, т.к. вызов внутри клика.
+  const p1 = audio1.play();
+  const p2 = audio2.play();
+  
+  if (p1 !== undefined) p1.catch(e => console.log("Звук 1:", e));
+  if (p2 !== undefined) p2.catch(e => console.log("Звук 2:", e));
 
   // --- ВИЗУАЛЬНЫЙ ЭФФЕКТ ---
   const box = document.getElementById('scare');
@@ -97,7 +97,6 @@ document.getElementById('btn').addEventListener('click', () => {
     audio2.currentTime = 0;
     if (document.fullscreenElement) document.exitFullscreen?.().catch(()=>{});
     
-    // Разрешаем нажать кнопку снова (если нужно)
     done = false; 
   }, 3000);
 });
