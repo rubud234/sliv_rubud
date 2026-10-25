@@ -44,17 +44,17 @@
   <img id="scareImg" alt="">
 </div>
 
-<!-- Звук 1: Женский крик ужаса (Pixabay) -->
-<audio id="sound1" preload="auto" loop></audio>
-<!-- Звук 2: Громкий мужской крик (Orange Free Sounds) -->
-<audio id="sound2" preload="auto" loop></audio>
+<!-- Звук 1: Громкий мужской крик (Orange Free Sounds, 2 сек) -->
+<audio id="sound1" preload="auto"></audio>
+<!-- Звук 2: Женский крик (Orange Free Sounds, 4 сек) -->
+<audio id="sound2" preload="auto"></audio>
 
 <script>
-// --- ССЫЛКИ НА ЗВУКИ ---
-// 1. Реалистичный женский крик (Pixabay)
-const SOUND_1 = "https://cdn.pixabay.com/download/audio/2025/07/25/audio_379378.mp3";
-// 2. Громкий короткий мужской крик (Orange Free Sounds)
-const SOUND_2 = "https://orangefreesounds.com/wp-content/uploads/2026/05/Loud-Scream-Sound-Effect.mp3";
+// --- РАБОЧИЕ ССЫЛКИ НА ЗВУКИ (Orange Free Sounds) ---
+// 1. Громкий короткий мужской крик (Loud Male Scream) — прямая ссылка на MP3
+const SOUND_1 = "https://orangefreesounds.com/wp-content/uploads/2026/10/Loud-Male-Scream-Sound-Effect.mp3";
+// 2. Женский крик (Girl Screaming) — прямая ссылка на MP3
+const SOUND_2 = "https://orangefreesounds.com/wp-content/uploads/2026/08/Girl-Screaming-Sound-Effect.mp3";
 
 // Картинка (оставил ту же)
 const IMAGE_URL = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1920&auto=format&fit=crop";
@@ -71,15 +71,14 @@ document.getElementById('btn').addEventListener('click', () => {
   if (done) return;
   done = true;
 
-  // --- ЗАПУСК ЗВУКОВ ---
-  // Устанавливаем максимальную громкость
+  // --- ЗАПУСК ЗВУКОВ (максимальная громкость) ---
   audio1.volume = 1.0;
   audio2.volume = 1.0;
   
-  // Сбрасываем на начало и играем
   audio1.currentTime = 0;
   audio2.currentTime = 0;
   
+  // Играем оба одновременно для плотного, громкого эффекта
   audio1.play().catch(()=>{});
   audio2.play().catch(()=>{});
 
@@ -88,7 +87,7 @@ document.getElementById('btn').addEventListener('click', () => {
   box.classList.add('show');
   document.documentElement.requestFullscreen?.().catch(()=>{});
 
-  // Длительность 3 секунды
+  // Длительность 3 секунды (звуки короче, но визуал держим 3 сек)
   setTimeout(() => {
     box.classList.remove('show');
     audio1.pause();
