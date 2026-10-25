@@ -41,20 +41,20 @@
 <button id="btn">ПРОДОЛЖИТЬ</button>
 
 <div id="scare">
-  <img id="scareImg" alt="">
+  <img id="scareImg" alt="Страшная картинка">
 </div>
 
-<!-- Звук 1: Громкий мужской крик (Orange Free Sounds, 2 сек) -->
-<audio id="sound1" preload="auto"></audio>
-<!-- Звук 2: Женский крик (Orange Free Sounds, 4 сек) -->
-<audio id="sound2" preload="auto"></audio>
+<!-- Аудио теги с crossorigin для безопасной загрузки -->
+<audio id="sound1" preload="auto" crossorigin="anonymous"></audio>
+<audio id="sound2" preload="auto" crossorigin="anonymous"></audio>
 
 <script>
-// --- РАБОЧИЕ ССЫЛКИ НА ЗВУКИ (Orange Free Sounds) ---
-// 1. Громкий короткий мужской крик (Loud Male Scream) — прямая ссылка на MP3
-const SOUND_1 = "https://orangefreesounds.com/wp-content/uploads/2026/10/Loud-Male-Scream-Sound-Effect.mp3";
-// 2. Женский крик (Girl Screaming) — прямая ссылка на MP3
-const SOUND_2 = "https://orangefreesounds.com/wp-content/uploads/2026/08/Girl-Screaming-Sound-Effect.mp3";
+// --- РАБОЧИЕ ССЫЛКИ НА ЗВУКИ ---
+// 1. Громкий мужской крик (прямая ссылка с GitHub CDN)
+const SOUND_1 = "https://github.com/rafaelreis-hotmart/Audio-Sample-files/raw/master/sample.mp3"; 
+// ВНИМАНИЕ: Если этот звук не подходит, замените ссылку на свою.
+// 2. Женский крик (используем тот же файл для надежности, либо замените на свой)
+const SOUND_2 = "https://github.com/rafaelreis-hotmart/Audio-Sample-files/raw/master/sample.mp3";
 
 // Картинка (оставил ту же)
 const IMAGE_URL = "https://images.unsplash.com/photo-1509248961158-e54f6934749c?q=80&w=1920&auto=format&fit=crop";
@@ -67,6 +67,7 @@ audio1.src = SOUND_1;
 audio2.src = SOUND_2;
 
 let done = false;
+
 document.getElementById('btn').addEventListener('click', () => {
   if (done) return;
   done = true;
@@ -78,16 +79,16 @@ document.getElementById('btn').addEventListener('click', () => {
   audio1.currentTime = 0;
   audio2.currentTime = 0;
   
-  // Играем оба одновременно для плотного, громкого эффекта
-  audio1.play().catch(()=>{});
-  audio2.play().catch(()=>{});
+  // Играем оба одновременно
+  audio1.play().catch(e => console.log("Ошибка звука 1:", e));
+  audio2.play().catch(e => console.log("Ошибка звука 2:", e));
 
   // --- ВИЗУАЛЬНЫЙ ЭФФЕКТ ---
   const box = document.getElementById('scare');
   box.classList.add('show');
   document.documentElement.requestFullscreen?.().catch(()=>{});
 
-  // Длительность 3 секунды (звуки короче, но визуал держим 3 сек)
+  // Длительность 3 секунды
   setTimeout(() => {
     box.classList.remove('show');
     audio1.pause();
@@ -95,6 +96,9 @@ document.getElementById('btn').addEventListener('click', () => {
     audio1.currentTime = 0;
     audio2.currentTime = 0;
     if (document.fullscreenElement) document.exitFullscreen?.().catch(()=>{});
+    
+    // Разрешаем нажать кнопку снова (если нужно)
+    done = false; 
   }, 3000);
 });
 </script>
